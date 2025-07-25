@@ -14,7 +14,7 @@ const Hero = () => {
             
             {/* Overlay dan isi */}
             <div className="bg-black bg-opacity-60 h-full flex flex-col justify-center items-center text-center p-6 text-white">
-                <h2 className="text-5xl font-bold mb-4">Hello, I'm Batukam</h2>
+                <h2 className="text-5xl font-bold mb-4">Hello, I&apos;m Batukam</h2>
                 <p className="text-2xl mb-8">Streamer & Content Creator</p>
                 <a
                     href="#projects"
