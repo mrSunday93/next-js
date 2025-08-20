@@ -2,26 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/poppins.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Di global.css */
+html, body {
+  overflow-x: hidden; /* Boleh ada */
+  overflow-y: auto; /* Pastikan ini */
+  height: 100%; /* Optional */
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative; /* Penting untuk layout */
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+html {
+  scroll-behavior: smooth;
 }

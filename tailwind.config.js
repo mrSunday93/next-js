@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {  // Diperbaiki dari 'ontFamily' menjadi 'fontFamily'
+        poppins: ['Poppins', 'sans-serif'],
+        custom: ['CustomFont', 'sans-serif'],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
