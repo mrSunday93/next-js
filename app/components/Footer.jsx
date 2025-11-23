@@ -2,17 +2,17 @@ const Footer = () => {
   return (
     <footer className="relative bg-[#101015] text-[#BEBEC4] py-16 px-6 border-t border-[#1F1F27]">
 
-      <div className="absolute top-0 left-0 w-20 h-[2px] bg-[#C77833]/40"></div>
-      <div className="absolute top-0 left-0 h-20 w-[2px] bg-[#C77833]/40"></div>
-      <div className="absolute bottom-0 right-0 w-20 h-[2px] bg-[#C77833]/40"></div>
-      <div className="absolute bottom-0 right-0 h-20 w-[2px] bg-[#C77833]/40"></div>
+      <div className="absolute top-0 left-0 w-20 h-[2px] bg-[#FF9300]/40"></div>
+      <div className="absolute top-0 left-0 h-20 w-[2px] bg-[#FF9300]/40"></div>
+      <div className="absolute bottom-0 right-0 w-20 h-[2px] bg-[#FF9300]/40"></div>
+      <div className="absolute bottom-0 right-0 h-20 w-[2px] bg-[#FF9300]/40"></div>
 
       <div className="container mx-auto max-w-7xl relative z-10">
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
 
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-[#C77833] tracking-wider uppercase border-b border-[#C77833]/40 pb-2">
+            <h2 className="text-xl font-bold text-[#FF9300] tracking-wider uppercase border-b border-[#FF9300]/40 pb-2">
               Onde-onde
             </h2>
             <p className="text-sm">Jl. Los angeles</p>
@@ -28,7 +28,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-[#C77833] uppercase tracking-wider border-b border-[#C77833]/40 pb-2">
+            <h2 className="text-xl font-bold text-[#FF9300] uppercase tracking-wider border-b border-[#FF9300]/40 pb-2">
               Menu
             </h2>
             <ul className="mt-4 space-y-3">
@@ -39,7 +39,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-[#C77833] uppercase tracking-wider border-b border-[#C77833]/40 pb-2">
+            <h2 className="text-xl font-bold text-[#FF9300] uppercase tracking-wider border-b border-[#FF9300]/40 pb-2">
               Jam Operasional
             </h2>
             <ul className="mt-4 space-y-3 text-sm">
