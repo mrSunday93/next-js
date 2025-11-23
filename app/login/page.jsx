@@ -1,85 +1,148 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-import { auth } from '@/app/db/firebase'
+import { auth, db } from '@/app/db/firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
+import { doc, getDoc } from 'firebase/firestore'
 
 export default function LoginPage() {
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
+
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-      router.push('/user')
+      const { user } = await signInWithEmailAndPassword(auth, email, password)
+      const snap = await getDoc(doc(db, 'users', user.uid))
+
+      if (!snap.exists()) {
+        setError("Akun tidak ditemukan di database!")
+        return
+      }
+
+      const data = snap.data()
+      if (data.name !== name || data.phoneNumber !== phone) {
+        setError('Nama atau nomor telepon tidak sesuai!')
+        return
+      }
+
+      if (data.role === "admin") router.push('/admin/dashboard')
+      else router.push('/user')
+
     } catch (err) {
-      console.error('Login gagal:', err.message)
+      setError("Login gagal. Periksa kembali data Anda.")
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Login ke akun anda
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#272727] p-6">
+      <div className="
+        max-w-md w-full p-8 space-y-8 rounded-2xl 
+        bg-[#1f1f1f] border border-[#3a3a3a]
+        shadow-[0_0_0_1px_#1a1a1a_inset]
+      ">
+        
+        <h2 className="text-center text-3xl font-bold text-white tracking-wide">
+          LOGIN PANEL
+        </h2>
+
+        {error && (
+          <p className="text-red-500 text-center font-medium bg-red-500/10 p-2 rounded-lg">
+            {error}
+          </p>
+        )}
+
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          
+          <div className="space-y-1">
+            <label className="text-sm text-gray-300 font-medium">Nama</label>
+            <input
+              placeholder="Nama"
+              className="
+                w-full p-3 rounded-xl bg-[#2b2b2b] text-white
+                border border-[#3a3a3a]
+                focus:border-[#FF9300] transition-all duration-200
+              "
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+            />
           </div>
 
-          <div className="text-sm text-right">
-            <Link href="/forgot-password" className="font-medium text-orange-600 hover:text-orange-500">
-              Lupa password?
-            </Link>
+          <div className="space-y-1">
+            <label className="text-sm text-gray-300 font-medium">Nomor Telepon</label>
+            <input
+              placeholder="Nomor telepon"
+              className="
+                w-full p-3 rounded-xl bg-[#2b2b2b] text-white
+                border border-[#3a3a3a]
+                focus:border-[#FF9300] transition-all duration-200
+              "
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              required
+            />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-            >
-              Masuk
-            </button>
+          <div className="space-y-1">
+            <label className="text-sm text-gray-300 font-medium">Email</label>
+            <input
+              placeholder="Email"
+              type="email"
+              className="
+                w-full p-3 rounded-xl bg-[#2b2b2b] text-white
+                border border-[#3a3a3a]
+                focus:border-[#FF9300] transition-all duration-200
+              "
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
           </div>
+
+          <div className="space-y-1">
+            <label className="text-sm text-gray-300 font-medium">Password</label>
+            <input
+              placeholder="Password"
+              type="password"
+              className="
+                w-full p-3 rounded-xl bg-[#2b2b2b] text-white
+                border border-[#3a3a3a]
+                focus:border-[#FF9300] transition-all duration-200
+              "
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="
+              w-full py-3 rounded-xl font-bold text-black
+              bg-[#FF9300] hover:bg-[#e88400]
+              transition-all duration-200
+            "
+          >
+            MASUK
+          </button>
+
         </form>
 
-        <div className="text-center text-sm">
-          <span className="text-gray-600">Dont have an account?</span>{' '}
-          <Link href="/register" className="font-medium text-orange-600 hover:text-orange-500">
-            Register now
+        <p className="text-center text-sm text-gray-400">
+          Belum punya akun?{" "}
+          <Link href="/register" className="text-[#FF9300] hover:underline">
+            Daftar
           </Link>
-        </div>
+        </p>
+
       </div>
     </div>
   )

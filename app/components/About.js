@@ -1,63 +1,95 @@
-import Image from 'next/image';
+"use client";
 
-const About = () => {
+import { 
+  ChefHat,
+  Leaf,
+  Flame,
+  Clock4,
+  ShieldCheck,
+  Zap
+} from "lucide-react";
+
+export default function About() {
   return (
-    <section className="bg-[#272727] py-12 px-4 sm:py-16 md:py-20">
-      <div className="container mx-auto max-w-4xl">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            About
-          </h1>
-          <div className="w-20 h-1 bg-[#FF9300] mx-auto"></div>
+    <section className="bg-[#1E1E1E] py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+
+        {/* TITLE */}
+        <h1 className="text-4xl font-bold text-[#FF8A00] mb-12">
+          Services
+        </h1>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <Card
+            Icon={ChefHat}
+            title="Resep Otentik"
+            desc="Menggunakan resep turun-temurun, memberikan rasa khas yang tidak berubah."
+          />
+
+          <Card
+            Icon={Leaf}
+            title="Bahan Premium"
+            desc="Semua onde-onde dibuat dari bahan-bahan berkualitas tinggi dan selalu segar."
+          />
+
+          <Card
+            Icon={Flame}
+            title="Teknik Tradisional"
+            desc="Diproduksi dengan teknik tradisional yang menjaga tekstur dan rasa autentik."
+          />
+
+          <Card
+            Icon={Clock4}
+            title="Produksi Harian"
+            desc="Onde-onde dibuat setiap hari untuk menjamin kesegaran maksimal."
+          />
+
+          <Card
+            Icon={ShieldCheck}
+            title="Kebersihan Terjamin"
+            desc="Diproses dengan standar kebersihan tinggi untuk keamanan dan kualitas terbaik."
+          />
+
+          <Card
+            Icon={Zap}
+            title="Produksi Cepat"
+            desc="Produksi cepat untuk memastikan kenyamanan pelanggan."
+          />
+
         </div>
 
-        {/* Content Section - Reversed order */}
-        <div className="flex flex-col lg:flex-row gap-8 items-center">
-          {/* Image on LEFT */}
-          <div className="lg:w-1/2 order-1">
-            <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg">
-              <Image
-                src="/image/about.jpg"
-                alt="Proses pembuatan onde-onde"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            </div>
-          </div>
-
-          {/* Text Content on RIGHT */}
-          <div className="lg:w-1/2 space-y-6 order-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#FF9300]">
-              Kenapa harus kami?
-            </h2>
-            
-            <p className="text-white text-lg leading-relaxed">
-              Kami adalah usaha rumahan yang mengkhususkan diri membuat onde-onde lezat dengan resep turun-temurun. Dibuat dari bahan-bahan pilihan, onde-onde kami memiliki kulit renyah di luar dan isi kacang hijau yang lembut serta manis di dalam.
-            </p>
-
-            {/* Features List */}
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF9300] mt-1">•</span>
-                <span className="text-white">Resep turun-temurun sejak 1985</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF9300] mt-1">•</span>
-                <span className="text-white">Bahan-bahan pilihan berkualitas</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF9300] mt-1">•</span>
-                <span className="text-white">Dibuat dengan teknik tradisional</span>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
     </section>
   );
-};
+}
 
-export default About;
+/* === CARD COMPONENT === */
+function Card({ Icon, title, desc }) {
+  return (
+    <div className="
+      bg-[#1A1A1A] rounded-xl p-8 flex flex-col items-center text-center
+      transition-all duration-300
+      hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(255,138,0,0.15)]
+      shadow-[0_0_20px_rgba(255,138,0,0.05)]
+    ">
+      
+      {/* ICON WRAPPER */}
+      <div className="w-14 h-14 bg-[#FF8A00]/15 rounded-xl flex items-center justify-center mb-5">
+        <Icon className="text-[#FF8A00]" size={30} strokeWidth={2.4} />
+      </div>
+
+      {/* TITLE */}
+      <h3 className="text-xl font-semibold text-[#FF8A00] mb-2">
+        {title}
+      </h3>
+
+      {/* DESC */}
+      <p className="text-[#D6D6D6] leading-relaxed">
+        {desc}
+      </p>
+
+    </div>
+  );
+}

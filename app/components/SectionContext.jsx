@@ -1,23 +1,33 @@
 'use client'
+
 import { createContext, useContext, useRef } from 'react'
+const SectionContext = createContext(null)
 
-export const SectionContext = createContext(null)
-
-export const SectionProvider = ({ children }) => {
+export function SectionProvider({ children }) {
   const homeRef = useRef(null)
   const aboutRef = useRef(null)
   const galleryRef = useRef(null)
   const contactRef = useRef(null)
 
   const scrollToSection = (ref) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth' })
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   return (
-    <SectionContext.Provider value={{ homeRef, aboutRef, galleryRef, contactRef, scrollToSection }}>
+    <SectionContext.Provider
+      value={{ homeRef, aboutRef, galleryRef, contactRef, scrollToSection }}
+    >
       {children}
     </SectionContext.Provider>
   )
 }
 
-export const useSection = () => useContext(SectionContext)
+export function useSection() {
+  const context = useContext(SectionContext)
+  if (!context) {
+    throw new Error('useSection harus dipakai di dalam <SectionProvider>')
+  }
+  return context
+}
