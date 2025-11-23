@@ -38,6 +38,7 @@ export default function CartPage() {
   }, 0);
 
   const totalQty = cartItems.reduce((s, i) => s + (Number(i.quantity) || 0), 0);
+
   const generateIncrementId = async () => {
     const counterRef = doc(db, "system", "orderCounter");
 
@@ -76,12 +77,11 @@ export default function CartPage() {
         const list = snap.docs.map((d) => {
           const data = d.data();
 
-       
           const variants =
             Array.isArray(data.variant)
               ? data.variant
               : typeof data.variant === "string"
-              ? [data.variant] 
+              ? [data.variant]
               : [];
 
           return {
@@ -101,7 +101,6 @@ export default function CartPage() {
 
     loadMenu();
   }, []);
-
 
   const handleVariantChange = (id, variant) => {
     setCartItems((prev) =>
@@ -214,7 +213,6 @@ export default function CartPage() {
       buktiPembayaran: buktiUrl,
     });
 
-   
     for (const it of cleanItems) {
       await updateDoc(doc(db, "menus", it.id), {
         stock: Math.max((it.stock || 0) - it.quantity, 0),
@@ -303,7 +301,8 @@ export default function CartPage() {
       const orderId = await saveOrderToFirestore(uploadedUrl);
       if (!orderId) throw new Error("Order gagal dibuat");
 
-      alert(`Pembayaran berhasil! Order ID: ${orderId}`);
+      alert("Pembayaran berhasil!"); // ← REVISI DI SINI
+
       setShowQRIS(false);
 
       router.push(`/order-status/user?orderId=${encodeURIComponent(orderId)}`);
