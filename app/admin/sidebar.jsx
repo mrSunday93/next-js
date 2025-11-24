@@ -2,7 +2,7 @@
 import { signOut } from "firebase/auth"
 import { auth } from "@/app/db/firebase"
 import { useRouter, usePathname } from "next/navigation"
-import { Home, Clock, ShoppingCart, LogOut } from "lucide-react"
+import { Home, Clock, ShoppingCart, History, LogOut } from "lucide-react"
 
 export default function Sidebar() {
   const router = useRouter()
@@ -12,6 +12,9 @@ export default function Sidebar() {
     { name: "Home", icon: <Home size={20} />, href: "/admin/dashboard" },
     { name: "Order", icon: <Clock size={20} />, href: "/admin/transaksi" },
     { name: "Edit Menu", icon: <ShoppingCart size={20} />, href: "/admin/menu" },
+
+    // 🔥 MENU BARU — RIWAYAT TRANSAKSI
+    { name: "Riwayat Transaksi", icon: <History size={20} />, href: "/admin/riwayat" },
   ]
 
   const handleLogout = async () => {
@@ -49,9 +52,10 @@ export default function Sidebar() {
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-lg 
                   border transition-all
-                  ${active
-                    ? "bg-[#FF9300] text-black border-[#FF9300]"
-                    : "bg-[#262626] border-[#3a3a3a] hover:bg-[#2e2e2e]"
+                  ${
+                    active
+                      ? "bg-[#FF9300] text-black border-[#FF9300]"
+                      : "bg-[#262626] border-[#3a3a3a] hover:bg-[#2e2e2e]"
                   }
                 `}
               >
@@ -59,7 +63,11 @@ export default function Sidebar() {
                   {item.icon}
                 </span>
 
-                <span className={`font-medium tracking-wide ${active ? "text-black" : "text-white"}`}>
+                <span
+                  className={`font-medium tracking-wide ${
+                    active ? "text-black" : "text-white"
+                  }`}
+                >
                   {item.name}
                 </span>
               </a>

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { db } from "@/app/db/firebase"
+import { useEffect, useState } from "react";
+import { db } from "@/app/db/firebase";
 import {
   collection,
   getDocs,
@@ -9,50 +9,84 @@ import {
   doc,
   addDoc,
   getDoc,
-} from "firebase/firestore"
+} from "firebase/firestore";
 
 export default function AdminTransaksi() {
-  const [activeTab, setActiveTab] = useState("Menunggu")
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [filterDate, setFilterDate] = useState("")
-  const [search, setSearch] = useState("")
+  const [activeTab, setActiveTab] = useState("Menunggu");
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterDate, setFilterDate] = useState("");
+  const [search, setSearch] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
+
+  // 🔥 STATE UNTUK MODAL KONFIRMASI
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    action: null,
+    orderId: null,
+    message: "",
+  });
+
+  const openConfirm = (orderId, action) => {
+    let msg =
+      action === "Dikonfirmasi"
+        ? "Yakin ingin KONFIRMASI pesanan ini?"
+        : action === "Ditolak"
+        ? "Yakin ingin MENOLAK pesanan ini?"
+        : "Yakin ingin melanjutkan aksi ini?";
+
+    setConfirmModal({
+      show: true,
+      orderId,
+      action,
+      message: msg,
+    });
+  };
+
+  const closeConfirm = () => {
+    setConfirmModal({
+      show: false,
+      action: null,
+      orderId: null,
+      message: "",
+    });
+  };
 
   const formatTokopediaTime = (date) => {
-    const d = new Date(date)
-    const now = new Date()
+    const d = new Date(date);
+    const now = new Date();
 
     const isToday =
       d.getDate() === now.getDate() &&
       d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear()
+      d.getFullYear() === now.getFullYear();
 
-    const yesterday = new Date(now)
-    yesterday.setDate(now.getDate() - 1)
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
 
     const isYesterday =
       d.getDate() === yesterday.getDate() &&
       d.getMonth() === yesterday.getMonth() &&
-      d.getFullYear() === yesterday.getFullYear()
+      d.getFullYear() === yesterday.getFullYear();
 
     const time = d.toLocaleTimeString("id-ID", {
       hour: "2-digit",
       minute: "2-digit",
-    })
+    });
 
-    if (isToday) return `Hari ini, ${time}`
-    if (isYesterday) return `Kemarin, ${time}`
+    if (isToday) return `Hari ini, ${time}`;
+    if (isYesterday) return `Kemarin, ${time}`;
 
     return `${d.toLocaleDateString("id-ID", {
       day: "2-digit",
       month: "short",
       year: "numeric",
-    })}, ${time}`
-  }
+    })}, ${time}`;
+  };
 
   const generateOrderId = (num) => {
-    return `ORD-${String(num).padStart(5, "0")}`
-  }
+    return `ORD-${String(num).padStart(5, "0")}`;
+  };
 
   const getVariant = (item) => {
     const raw =
@@ -61,66 +95,66 @@ export default function AdminTransaksi() {
       item.rasa ||
       item.flavor ||
       item.varian ||
-      null
+      null;
 
-    if (!raw) return null
-    return Array.isArray(raw) ? raw.join(", ") : raw
-  }
+    if (!raw) return null;
+    return Array.isArray(raw) ? raw.join(", ") : raw;
+  };
 
   useEffect(() => {
     const loadOrders = async () => {
-      const snap = await getDocs(collection(db, "orders"))
-      let list = []
-      let counter = 1
+      const snap = await getDocs(collection(db, "orders"));
+      let list = [];
+      let counter = 1;
 
       for (const d of snap.docs) {
-        const order = { id: d.id, ...d.data() }
+        const order = { id: d.id, ...d.data() };
 
         if (!order.orderId) {
-          const newId = generateOrderId(counter++)
-          order.orderId = newId
-          await updateDoc(doc(db, "orders", d.id), { orderId: newId })
+          const newId = generateOrderId(counter++);
+          order.orderId = newId;
+          await updateDoc(doc(db, "orders", d.id), { orderId: newId });
         }
 
         if (order.items && Array.isArray(order.items)) {
           order.items = order.items.map((item) => ({
             ...item,
             itemId: item.itemId || crypto.randomUUID(),
-          }))
+          }));
         }
 
         if (order.userId) {
-          const userDoc = await getDoc(doc(db, "users", order.userId))
+          const userDoc = await getDoc(doc(db, "users", order.userId));
           if (userDoc.exists()) {
-            const u = userDoc.data()
-            order.userName = u.name || u.fullName || "Tanpa Nama"
-            order.userEmail = u.email || "Tanpa Email"
-            order.userPhone = u.phoneNumber || "Tanpa Nomor Telepon"
+            const u = userDoc.data();
+            order.userName = u.name || u.fullName || "Tanpa Nama";
+            order.userEmail = u.email || "Tanpa Email";
+            order.userPhone = u.phoneNumber || "Tanpa Nomor Telepon";
           }
         }
 
-        list.push(order)
+        list.push(order);
       }
 
-      setOrders(list)
-      setLoading(false)
-    }
+      setOrders(list);
+      setLoading(false);
+    };
 
-    loadOrders()
-  }, [])
+    loadOrders();
+  }, []);
 
   const simpanTransaksi = async (order) => {
     try {
       const menuString =
         order.items
           ?.map((i) => {
-            const v = getVariant(i)
-            return `${i.name} x ${i.quantity}${v ? ` (${v})` : ""}`
+            const v = getVariant(i);
+            return `${i.name} x ${i.quantity}${v ? ` (${v})` : ""}`;
           })
           .join(", ") ||
         `${order.produk} x ${order.jumlah}${
           order.varian ? ` (${order.varian})` : ""
-        }`
+        }`;
 
       await addDoc(collection(db, "transaksi"), {
         transaksiId: crypto.randomUUID(),
@@ -132,27 +166,35 @@ export default function AdminTransaksi() {
         total: order.total,
         items: order.items || [],
         tanggal: new Date().toLocaleString("id-ID"),
-      })
+      });
     } catch (e) {
-      console.error("Gagal menyimpan transaksi:", e)
+      console.error("Gagal menyimpan transaksi:", e);
     }
-  }
+  };
 
   const updateStatus = async (id, status) => {
-    const order = orders.find((o) => o.id === id)
+    const order = orders.find((o) => o.id === id);
 
-    await updateDoc(doc(db, "orders", id), { status })
+    await updateDoc(doc(db, "orders", id), { status });
 
     setOrders((prev) =>
       prev.map((o) => (o.id === id ? { ...o, status } : o))
-    )
+    );
 
     if (status === "Dikonfirmasi") {
-      await simpanTransaksi(order)
+      await simpanTransaksi(order);
     }
-  }
+  };
 
-  if (loading) return <p className="p-6 text-white">Loading...</p>
+  const confirmAction = async () => {
+    const { orderId, action } = confirmModal;
+    if (!orderId || !action) return;
+
+    await updateStatus(orderId, action);
+    closeConfirm();
+  };
+
+  if (loading) return <p className="p-6 text-white">Loading...</p>;
 
   const tabList = [
     "Menunggu",
@@ -160,34 +202,40 @@ export default function AdminTransaksi() {
     "Siap pickup",
     "Selesai",
     "Ditolak",
-  ]
+  ];
 
-  const filteredOrders = orders.filter((o) => {
-    const sameStatus = o.status === activeTab
-    if (!sameStatus) return false
+  let filteredOrders = orders.filter((o) => {
+    const sameStatus = o.status === activeTab;
+    if (!sameStatus) return false;
 
     if (filterDate && o.waktu?.toDate) {
-      const orderDate = o.waktu.toDate().toISOString().split("T")[0]
-      if (orderDate !== filterDate) return false
+      const orderDate = o.waktu.toDate().toISOString().split("T")[0];
+      if (orderDate !== filterDate) return false;
     }
 
     if (search.trim() !== "") {
-      const s = search.toLowerCase()
+      const s = search.toLowerCase();
       return (
         o.userName?.toLowerCase().includes(s) ||
         o.userEmail?.toLowerCase().includes(s) ||
         o.userPhone?.toLowerCase().includes(s)
-      )
+      );
     }
 
-    return true
-  })
+    return true;
+  });
+
+  filteredOrders.sort((a, b) => {
+    const timeA = a.waktu?.toDate ? a.waktu.toDate().getTime() : 0;
+    const timeB = b.waktu?.toDate ? b.waktu.toDate().getTime() : 0;
+    return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
+  });
 
   return (
     <div className="bg-[#1E1E1E] min-h-screen text-white p-8">
       <h2 className="text-4xl font-extrabold mb-8 text-[#FF9300]">Order</h2>
 
-      {/* Search */}
+      {/* SEARCH */}
       <div className="mb-6 bg-[#252525] p-4 rounded-lg border border-[#3a3a3a] w-full max-w-md">
         <label className="text-sm text-gray-300">
           Cari nama / email / no telp:
@@ -201,7 +249,7 @@ export default function AdminTransaksi() {
         />
       </div>
 
-      {/* Filter tanggal */}
+      {/* FILTER TANGGAL */}
       <div className="mb-6 bg-[#252525] p-4 rounded-lg border border-[#3a3a3a] w-fit">
         <label className="text-sm text-gray-300">Sortir berdasarkan tanggal:</label>
         <input
@@ -212,7 +260,15 @@ export default function AdminTransaksi() {
         />
       </div>
 
-      {/* Tabs */}
+      {/* SORT TOGGLE */}
+      <button
+        onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+        className="mb-6 bg-[#FF9300] text-black px-4 py-2 rounded-lg font-semibold"
+      >
+        Urutkan: {sortOrder === "desc" ? "Terbaru → Terlama" : "Terlama → Terbaru"}
+      </button>
+
+      {/* TABS */}
       <div className="flex bg-[#1c1c1c] rounded-xl overflow-hidden border border-[#3a3a3a]">
         {tabList.map((tab) => (
           <button
@@ -229,7 +285,7 @@ export default function AdminTransaksi() {
         ))}
       </div>
 
-      {/* Cards */}
+      {/* CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
         {filteredOrders.map((order) => (
           <div
@@ -241,7 +297,7 @@ export default function AdminTransaksi() {
               {order.orderId}
             </p>
 
-            {/* Waktu Tokopedia */}
+            {/* WAKTU */}
             {order.waktu?.toDate && (
               <p className="text-sm mb-2">
                 <span className="font-bold text-[#FF9300]">Waktu:</span>{" "}
@@ -267,7 +323,7 @@ export default function AdminTransaksi() {
             <p className="font-semibold text-[#FF9300]">Pesanan</p>
 
             {order.items?.map((i) => {
-              const v = getVariant(i)
+              const v = getVariant(i);
               return (
                 <p key={i.itemId}>
                   {i.name} — {i.quantity}
@@ -278,14 +334,14 @@ export default function AdminTransaksi() {
                     </>
                   )}
                 </p>
-              )
+              );
             })}
 
             <p className="text-[#FF9300] font-bold mt-3 text-lg">
               Total: Rp {order.total?.toLocaleString("id-ID")}
             </p>
 
-            {/* Status Badge */}
+            {/* STATUS BADGE */}
             <div className="mt-4">
               <span
                 className={`px-3 py-1 rounded-lg text-xs font-bold tracking-wide border
@@ -315,18 +371,18 @@ export default function AdminTransaksi() {
               </span>
             </div>
 
-            {/* Buttons */}
+            {/* BUTTONS */}
             {activeTab === "Menunggu" && (
               <div className="flex gap-2 mt-5">
                 <button
-                  onClick={() => updateStatus(order.id, "Dikonfirmasi")}
+                  onClick={() => openConfirm(order.id, "Dikonfirmasi")}
                   className="flex-1 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg text-sm font-semibold transition"
                 >
                   Konfirmasi
                 </button>
 
                 <button
-                  onClick={() => updateStatus(order.id, "Ditolak")}
+                  onClick={() => openConfirm(order.id, "Ditolak")}
                   className="flex-1 bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-sm font-semibold transition"
                 >
                   Tolak
@@ -347,8 +403,8 @@ export default function AdminTransaksi() {
               <div className="flex gap-2 mt-5">
                 <button
                   onClick={() => {
-                    if (!confirm("Konfirmasi: pesanan sudah diambil?")) return
-                    updateStatus(order.id, "Selesai")
+                    if (!confirm("Konfirmasi: pesanan sudah diambil?")) return;
+                    updateStatus(order.id, "Selesai");
                   }}
                   className="flex-1 bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg text-sm font-semibold transition"
                 >
@@ -357,8 +413,8 @@ export default function AdminTransaksi() {
 
                 <button
                   onClick={() => {
-                    if (!confirm("Kembalikan status ke Dikonfirmasi?")) return
-                    updateStatus(order.id, "Dikonfirmasi")
+                    if (!confirm("Kembalikan status ke Dikonfirmasi?")) return;
+                    updateStatus(order.id, "Dikonfirmasi");
                   }}
                   className="flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-semibold transition"
                 >
@@ -384,6 +440,35 @@ export default function AdminTransaksi() {
           Tidak ada pesanan yang cocok.
         </p>
       )}
+
+      {/* 🔥 MODAL KONFIRMASI */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#202020] w-full max-w-md p-6 rounded-2xl border border-[#FF9300] shadow-lg">
+            <h3 className="text-xl font-bold text-[#FF9300] mb-4">
+              Konfirmasi Aksi
+            </h3>
+
+            <p className="text-gray-200 mb-6">{confirmModal.message}</p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={closeConfirm}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-semibold transition"
+              >
+                Batal
+              </button>
+
+              <button
+                onClick={confirmAction}
+                className="flex-1 bg-[#FF9300] hover:bg-[#e58100] text-black px-4 py-2 rounded-lg text-sm font-semibold transition"
+              >
+                Ya, Lanjutkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
