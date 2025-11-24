@@ -49,6 +49,15 @@ export default function RiwayatTransaksi() {
           tanggalDate: tgl,
           tanggalKey: key,
           tanggalTimestamp: tgl.getTime() || 0,
+
+          // ===== AUTO DETECT FIELD NAMA USER =====
+          userDisplayName:
+            raw.userName ||
+            raw.nama ||
+            raw.username ||
+            raw.customerName ||
+            raw.pembeli ||
+            "Tidak ada nama",
         }
       })
 
@@ -84,7 +93,9 @@ export default function RiwayatTransaksi() {
   }
 
   // === SORT TERBARU KE LAMA ===
-  tanggalList.sort((a, b) => grouped[b].tanggalTimestamp - grouped[a].tanggalTimestamp)
+  tanggalList.sort(
+    (a, b) => grouped[b].tanggalTimestamp - grouped[a].tanggalTimestamp
+  )
 
   return (
     <div className="bg-[#1E1E1E] min-h-screen text-white p-8">
@@ -117,7 +128,9 @@ export default function RiwayatTransaksi() {
           const hari = grouped[tgl]
 
           // Sort transaksi dalam tanggal: terbaru → lama
-          hari.transaksi.sort((a, b) => b.tanggalTimestamp - a.tanggalTimestamp)
+          hari.transaksi.sort(
+            (a, b) => b.tanggalTimestamp - a.tanggalTimestamp
+          )
 
           return (
             <div
@@ -157,6 +170,12 @@ export default function RiwayatTransaksi() {
                       {t.orderId}
                     </p>
 
+                    {/* === NAMA USER === */}
+                    <p className="text-sm mt-1">
+                      <span className="font-bold text-[#FF9300]">Nama:</span>{" "}
+                      {t.userDisplayName}
+                    </p>
+
                     <p className="text-sm mt-1">
                       <span className="font-bold text-[#FF9300]">Waktu:</span>{" "}
                       {t.tanggal}
@@ -169,9 +188,7 @@ export default function RiwayatTransaksi() {
                     </p>
                     <p className="text-sm">{t.menu}</p>
 
-                    <p className="font-semibold text-[#FF9300] mt-3">
-                      Total:
-                    </p>
+                    <p className="font-semibold text-[#FF9300] mt-3">Total:</p>
                     <p className="text-lg font-bold">
                       Rp {t.total?.toLocaleString("id-ID")}
                     </p>
